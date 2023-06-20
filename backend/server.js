@@ -5,6 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const userRoutes = require("./routes/userRoute");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 dotenv.config();
@@ -14,11 +15,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Routes Middleware
+// Routes Middlewares
 app.use("/api/users", userRoutes);
-app.get("/", (req, res, next) => {
-  res.send("Home Page");
-});
+
+// Error Middlewares
+app.use(notFound);
+app.use(errorHandler);
 
 // Connect to mongoDB
 const connect = async () => {
