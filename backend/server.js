@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+const userRoutes = require("./routes/userRoute");
+
 const app = express();
 dotenv.config();
 
@@ -12,7 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Routes
+// Routes Middleware
+app.use("/api/users", userRoutes);
 app.get("/", (req, res, next) => {
   res.send("Home Page");
 });
