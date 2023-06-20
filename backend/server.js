@@ -7,11 +7,21 @@ const bodyParser = require("body-parser");
 const app = express();
 dotenv.config();
 
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Routes
+app.get("/", (req, res, next) => {
+  res.send("Home Page");
+});
+
 // Connect to mongoDB
 const connect = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log(`Connect to mongoDB!`);
+    console.log(`Connected to mongoDB!`);
   } catch (err) {
     console.error(`Error: ${err.message}`);
   }
