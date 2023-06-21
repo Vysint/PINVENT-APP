@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const verifyToken = require("../utils/jwt");
 
 exports.registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -45,6 +46,7 @@ exports.registerUser = async (req, res, next) => {
       password,
     });
     const savedUser = await newUser.save();
+    verifyToken(res, savedUser._id);
     res.status(201).json({
       _id: savedUser._id,
       name: savedUser.name,
