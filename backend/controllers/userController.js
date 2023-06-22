@@ -118,3 +118,28 @@ exports.logout = async (req, res, next) => {
   });
   res.status(200).json({ message: "Successfully Logged Out" });
 };
+
+// @desc   Get user
+// route   GET /api/users/logout
+// @access Public
+
+exports.getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        photo: user.photo,
+        phone: user.phone,
+        bio: user.bio,
+      });
+    } else {
+      res.status(401);
+      throw new Error("User not found, please login");
+    }
+  } catch (err) {
+    return next(err);
+  }
+};
