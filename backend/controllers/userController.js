@@ -116,5 +116,5 @@ exports.logout = async (req, res, next) => {
     httpOnly: true,
     expires: new Date(0),
   });
-  res.status(200).json({ message: "Successfullt Logged Out" });
+  res.status(200).json({ message: "Successfully Logged Out" });
 };
