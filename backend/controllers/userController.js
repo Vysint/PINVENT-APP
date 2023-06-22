@@ -95,6 +95,7 @@ exports.loginUser = async (req, res, next) => {
       res.status(401);
       throw new Error("Wrong Password");
     }
+
     verifyToken(res, user._id);
     res.status(200).json({
       _id: user._id,
