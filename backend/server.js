@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const userRoutes = require("./routes/userRoute");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -12,8 +13,10 @@ dotenv.config();
 
 // Middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(cookieParser());
 
 // Routes Middlewares
 app.use("/api/users", userRoutes);
