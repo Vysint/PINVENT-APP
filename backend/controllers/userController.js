@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const verifyToken = require("../utils/jwt");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // @desc   Register a new user
 // route   POST /api/users
@@ -142,4 +143,23 @@ exports.getUser = async (req, res, next) => {
   } catch (err) {
     return next(err);
   }
+};
+
+// @desc   Get login status
+// route   GET /api/users/loggedin
+// @access Public
+
+exports.loginStatus = async (req, res, next) => {
+  const token = req.cookies.jwt;
+
+  if (!token) {
+    return res.json(false);
+  }
+
+  // Verify Token
+  const verified = jwt.verify(token, process.env.JWT_SECRET);
+  if (verified) {
+    return res.json(true);
+  }
+  return res.json(false);
 };
