@@ -166,7 +166,7 @@ exports.loginStatus = async (req, res, next) => {
 
 // @desc   Update user
 // route   PATCH /api/users/updateuser
-// @access private
+// @access Private
 
 exports.updateUser = async (req, res, next) => {
   try {
@@ -191,6 +191,46 @@ exports.updateUser = async (req, res, next) => {
     } else {
       res.status(400);
       throw new Error("User Not Found");
+    }
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// @desc   Change Password
+// route   PATCH /api/users/changepassword
+// @access Private
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { oldPassword, password } = req.body;
+    if (user) {
+      // Validatte
+      if (!oldPassword || !password) {
+        res.status(400);
+        throw new Error("Please add old and new Password");
+      }
+      try {
+        // Check if old password matches user password in the DB
+        const passwordisValid = await bcrypt.compare(
+          oldPassword,
+          user.password
+        );
+        if (user && passwordisValid) {
+          user.password = password;
+          await user.save();
+          res.status(200).send("Password Change Successful");
+        } else {
+          res.status(400);
+          throw new Error("Old Password is incorrect");
+        }
+      } catch (err) {
+        return next(err);
+      }
+    } else {
+      res.status(400);
+      throw new Error("User not found, please sign in");
     }
   } catch (err) {
     return next(err);
