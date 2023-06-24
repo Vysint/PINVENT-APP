@@ -122,7 +122,7 @@ exports.logout = async (req, res, next) => {
 
 // @desc   Get user
 // route   GET /api/users/logout
-// @access Public
+// @access private
 
 exports.getUser = async (req, res, next) => {
   try {
@@ -162,4 +162,37 @@ exports.loginStatus = async (req, res, next) => {
     return res.json(true);
   }
   return res.json(false);
+};
+
+// @desc   Update user
+// route   PATCH /api/users/updateuser
+// @access private
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      const { name, email, photo, phone, bio } = user;
+      user.email = email;
+      user.name = req.body.name || name;
+      user.photo = req.body.photo || photo;
+      user.phone = req.body.phone || phone;
+      user.bio = req.body.bio || bio;
+      const updatedUser = await user.save();
+
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        photo: updatedUser.photo,
+        bio: updatedUser.bio,
+      });
+    } else {
+      res.status(400);
+      throw new Error("User Not Found");
+    }
+  } catch (err) {
+    return next(err);
+  }
 };
