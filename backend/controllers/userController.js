@@ -1,7 +1,11 @@
-const User = require("../models/userModel");
-const verifyToken = require("../utils/jwt");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+const User = require("../models/userModel");
+const verifyToken = require("../utils/jwt");
+const Token = require("../models/tokenModel");
+const sendEmail = require("../utils/sendEmail");
 
 // @desc   Register a new user
 // route   POST /api/users
@@ -231,6 +235,70 @@ exports.changePassword = async (req, res, next) => {
     } else {
       res.status(400);
       throw new Error("User not found, please sign in");
+    }
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// @desc   Reset Password
+// route   PATCH /api/users/forgotpassword
+// @access Public
+
+exports.forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      // Create a reset token
+      let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+
+      //Hash token before saving to DB
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+
+      // Save Token to the DB
+      await new Token({
+        userId: user._id,
+        token: hashedToken,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 30 * (60 * 1000), // 30 mins
+      }).save();
+
+      // Construct Reset Url
+      const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+
+      // Reset Password Email
+      const message = `
+      <h2>Hello ${user.name}</h2>
+      <p>You requested for a password reset</p>
+      <p>Please use the link below to reset your password</p>
+      <p>This reset link if valid for only 30 minutes</p>
+
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+
+      <p>Regards</p>
+
+      <p>Pinvent Team</p>
+      `;
+
+      // Email Options
+      const subject = "Password Reset Request";
+      const send_to = user.email;
+      const sent_from = process.env.EMAIL_USER;
+
+      try {
+        await sendEmail(subject, message, send_to, sent_from);
+        res.status(200).json({ success: true, message: "Reset email sent" });
+      } catch (err) {
+        res.status(500);
+        throw new Error("Email not sent, please try again");
+      }
+    } else {
+      res.status(404);
+      throw new Error("User does not exist");
     }
   } catch (err) {
     return next(err);
