@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const User = require("../models/userModel");
 const verifyToken = require("../utils/jwt");
 const Token = require("../models/tokenModel");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail } = require("../utils/sendEmail");
 
 // @desc   Register a new user
 // route   POST /api/users
