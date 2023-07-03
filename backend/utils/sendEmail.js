@@ -28,8 +28,9 @@ module.exports = {
     transporter.sendMail(options, function (err, info) {
       if (err) {
         console.log(err);
+      } else {
+        console.log(info);
       }
-      console.log(info);
     });
   },
 };
