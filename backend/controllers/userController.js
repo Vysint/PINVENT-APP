@@ -250,6 +250,15 @@ exports.forgotPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
+      // Delete token if it exists in the DB
+      let token = await Token.findOne({ userId: user._id });
+      try {
+        if (token) await User.deleteOne();
+      } catch (err) {
+        res.status(400);
+        throw new Error(err);
+      }
+
       // Create a reset token
       let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
 

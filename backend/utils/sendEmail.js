@@ -19,7 +19,7 @@ exports.sendEmail = async (subject, message, send_to, sent_from, reply_to) => {
     from: sent_from,
     to: send_to,
     replyTo: reply_to,
-    subject: subject,
+    subject,
     html: message,
   };
 
